@@ -1,0 +1,112 @@
+<br>
+<br>
+<br>
+<br>
+
+<div>
+	
+<%= form_tag(movies_index_path, :method => "get", id: "search-form") do %>
+<%= text_field_tag :search, params[:search], placeholder: "Search movies" %>
+<%= submit_tag "Search" %>
+<% end %>
+</div>
+<br>
+
+
+
+<%if  @response.present?%>
+
+<table id="example" class="table table-striped table-bordered" style="width:100%">
+ 	<thead>
+	  	<tr> 
+	  	  <th></th>
+		  <th>Title</th>
+		  <th>Year</th>
+		  <th>IMDBID</th>
+		  <th>Type</th>
+		  <th>post</th>
+		  <th>Action</th>
+		
+	   </tr>
+    </thead> 
+    <%  @response["Search"].each do |data| %>  
+       
+	    <tr>
+	    <td></td>
+	    <td><%= data["Title"] %></td>
+	    <td><%= data["Year"] %></td>
+	    <td><%= data["imdbID"]%></td>
+	    <td><%= data["Type"] %></td>
+	    <% if data["Poster"].present? %>
+	    <td><img style= "width:20%" src=<%= data["Poster"] %></td> 
+	    <%else %>
+	    <td> </td>
+        <% end %>
+	    <td> <%= link_to "show", {:controller => "movies", :action => "show", :id =>data["imdbID"] } %></td>
+	  
+	    </tr>
+    <% end %>
+</table> 
+<%else%>
+<h1>No Movies Found..! </h1>
+<% end %>
+
+<script type="text/javascript">
+
+	 $(document).ready(function() {
+ if ( ! $.fn.DataTable.isDataTable('#example')) {
+
+  
+
+    var table = $('#example').DataTable( {
+    	dom: 'Bfrtip',
+        columnDefs: [ {
+           
+            className: 'select-checkbox',
+            'targets': 0,
+            'checkboxes': {
+               'selectRow': true
+            }
+        } ],
+        select: {
+            style:    'multi',
+            selector: 'td:first-child'
+        },
+        order: [[ 1, 'asc' ]],
+        bFilter: false,
+        buttons: [
+            {
+                text: 'Add Favorites',
+                action: function () {
+                    let obj = [];
+                    localStorage.removeItem('favorites');
+                    if(table.rows( { selected: true } ).count() == 0)
+                    {
+                    	alert("Select the records");
+                    }
+                    else{
+                    
+                    if(localStorage.getItem("favorites") == null)
+                    {
+                    	table.rows( { selected: true } ).data().each(function(data){ 
+                    			obj.push(data);
+                    	});
+                    }
+                    
+                   	   
+    					localStorage.setItem('favorites',JSON.stringify(obj));
+    					alert("Movies Added To favorite list Successfully");
+    				}
+                }
+            }
+     
+
+        ]
+    } );
+
+     }
+} );
+</script>
+
+
+
